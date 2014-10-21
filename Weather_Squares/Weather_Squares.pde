@@ -26,10 +26,12 @@ PShape wind;
 PShape location;
 PFont helvetica;
 PFont coquette;
+String zip;
 
 
 void setup() {
   size (800, 700);
+  zip = "33134";
   //Load Icons: Free royalty-free icons from RoundsIcons.com via SmashingMagazine.com
   clock = loadShape("Icons_clock.svg");
   cloud = loadShape("Icons_cloud.svg");
@@ -52,7 +54,7 @@ void setup() {
   helvetica = loadFont("Helvetica-48.vlw");
   coquette = loadFont("Coquette-48.vlw");
   //Find Data
-  String url = "http://graphical.weather.gov/xml/sample_products/browser_interface/ndfdXMLclient.php?whichClient=NDFDgenMultiZipCode&lat=&lon=&listLatLon=&lat1=&lon1=&lat2=&lon2=&resolutionSub=&listLat1=&listLon1=&listLat2=&listLon2=&resolutionList=&endPoint1Lat=&endPoint1Lon=&endPoint2Lat=&endPoint2Lon=&listEndPoint1Lat=&listEndPoint1Lon=&listEndPoint2Lat=&listEndPoint2Lon=&zipCodeList=33134&listZipCodeList=&centerPointLat=&centerPointLon=&distanceLat=&distanceLon=&resolutionSquare=&listCenterPointLat=&listCenterPointLon=&listDistanceLat=&listDistanceLon=&listResolutionSquare=&citiesLevel=&listCitiesLevel=&sector=&gmlListLatLon=&featureType=&requestedTime=&startTime=&endTime=&compType=&propertyName=&product=time-series&begin=2004-01-01T00%3A00%3A00&end=2018-10-13T00%3A00%3A00&Unit=e&temp=temp&pop12=pop12&wspd=wspd&wdir=wdir&sky=sky&wx=wx&rh=rh&wwa=wwa&Submit=Submit";
+  String url = "http://graphical.weather.gov/xml/sample_products/browser_interface/ndfdXMLclient.php?whichClient=NDFDgenMultiZipCode&lat=&lon=&listLatLon=&lat1=&lon1=&lat2=&lon2=&resolutionSub=&listLat1=&listLon1=&listLat2=&listLon2=&resolutionList=&endPoint1Lat=&endPoint1Lon=&endPoint2Lat=&endPoint2Lon=&listEndPoint1Lat=&listEndPoint1Lon=&listEndPoint2Lat=&listEndPoint2Lon=&zipCodeList="+zip+"&listZipCodeList=&centerPointLat=&centerPointLon=&distanceLat=&distanceLon=&resolutionSquare=&listCenterPointLat=&listCenterPointLon=&listDistanceLat=&listDistanceLon=&listResolutionSquare=&citiesLevel=&listCitiesLevel=&sector=&gmlListLatLon=&featureType=&requestedTime=&startTime=&endTime=&compType=&propertyName=&product=time-series&begin=2004-01-01T00%3A00%3A00&end=2018-10-13T00%3A00%3A00&Unit=e&temp=temp&pop12=pop12&wspd=wspd&wdir=wdir&sky=sky&wx=wx&rh=rh&wwa=wwa&Submit=Submit";
   String[] lines = loadStrings(url); //removed varialbe url
   String xml = join(lines, "" ); // Turn array into one long String
   String t = "";
@@ -102,7 +104,7 @@ void setup() {
 void draw() {
   smooth();
   background (0);
-  stroke(48);
+  stroke(65);
   strokeWeight(2);
   //Labels
   textFont(coquette, 55);
@@ -111,7 +113,7 @@ void draw() {
   text("Temperature", 25, 150 );
   text("Precipitation", 30, 250 );
   text("Cloud Coverage", 12, 350 );
-  text("Temperature", 30, 450 );
+  text("Wind", 55, 450 );
   text("Humidity", 45, 550 );
   shape(clock, 75, 608);
   shape(location, 75, 560);
@@ -120,6 +122,7 @@ void draw() {
     textFont(helvetica, 18);
     text(dates[dt], dt_x, 668 );
     text(times[dt], dt_x+14, 689 );
+    text(zip,dt_x,625);
     dt_x +=125;
   }
   //Draw Grid
@@ -131,30 +134,54 @@ void draw() {
   }
 
   //Draw Temperature Icons
-  int temp_x = 290;
+  int temp_x = 295;
   for (int j =0; j<4; j++) {
     if (temperatures[j] >=120) {
       shape(thermometer, temp_x, 67);
+      fill(255);
+      textFont(helvetica, 15);
+      text("Extremely Hot: "+temperatures[j]+"°", temp_x+0, 77);
     } else if (temperatures[j]>=100) {
       shape(flame_full, temp_x, 67);
+      fill(255);
+      textFont(helvetica, 15);
+      text("Very Hot: "+temperatures[j]+"°", temp_x+0, 77);
     } else if (temperatures[j]>= 85) {
       shape(flame_small, temp_x, 67);
+      fill(255);
+      textFont(helvetica, 15);
+      text("Hot: "+temperatures[j]+"°", temp_x+0, 77);
     } else if (temperatures[j]>=68) {
       shape(t_shirt, temp_x, 67);
+      fill(255);
+      textFont(helvetica, 12);
+      text("Comfortable: "+temperatures[j]+"°", temp_x+30, 175);
     } else if (temperatures[j]>=58) {
       shape(hoodie, temp_x, 67);
+      fill(255);
+      textFont(helvetica, 15);
+      text("Cool: "+temperatures[j]+"°", temp_x+0, 77);
     } else if (temperatures[j]>= 32) {
       shape(scully, temp_x, 67);
+      fill(255);
+      textFont(helvetica, 15);
+      text("Cold: "+temperatures[j]+"°", temp_x+0, 77);
     } else if (temperatures[j]>=14) {
       shape(snowflake, temp_x, 67);
+      fill(255);
+      textFont(helvetica, 15);
+      text("Very Cold: "+temperatures[j]+"°", temp_x+0, 77);
     } else {
       shape(snowman, temp_x, 70);
+      fill(255);
+      textFont(helvetica, 15);
+      text("Extremely Cold: "+temperatures[j]+"°", temp_x+0, 77);
     }
     temp_x +=125;
   }
 
   //Draw Clouds
-  frameRate(5);
+  frameRate(3);
 
   PShape clouds0 [] = new PShape [round(cloudCoverage[0]/10)];
   for (int c0 =0; c0 <= clouds0.length-1; c0++) {
@@ -182,9 +209,10 @@ void draw() {
 
   //Draw Wind
   int wind_x = 292;
+  int wind_y = 364;
   for (int wnds =0; wnds<4; wnds++) {
     fill(255);
-    shape(wind, wind_x, 364);
+    shape(wind, wind_x, wind_y);
     textFont(helvetica, 18);
     text(+windSpeeds[wnds]+" MPH", wind_x+50, 482);
     wind_x+=125;
