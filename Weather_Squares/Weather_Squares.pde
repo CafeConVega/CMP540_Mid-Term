@@ -25,14 +25,14 @@ PShape turkey;
 PShape water_drop;
 PShape wind;
 PShape location;
+PShape noaa;
 PFont helvetica;
 PFont coquette;
 String zip;
 
-
 void setup() {
   size (800, 700);
-  zip = "33134";
+  zip = "60604";
   //Load Icons: Free royalty-free icons from RoundsIcons.com via SmashingMagazine.com
   clock = loadShape("Icons_clock.svg");
   cloud = loadShape("Icons_cloud.svg");
@@ -52,9 +52,11 @@ void setup() {
   water_drop = loadShape("Icons_water_drop.svg");
   wind = loadShape("Icons_wind.svg");
   location = loadShape("Icons_location.svg");
+  noaa = loadShape("Icons_noaa.svg");
   helvetica = loadFont("Helvetica-48.vlw");
   coquette = loadFont("Coquette-48.vlw");
-  //Find Data
+
+  //Pull Data from National Oceanic and Atmospheric Administration Web Service <http://www.nws.noaa.gov/mdl/survey/pgb_survey/dev/rest.php>
   String url = "http://graphical.weather.gov/xml/sample_products/browser_interface/ndfdXMLclient.php?whichClient=NDFDgenMultiZipCode&lat=&lon=&listLatLon=&lat1=&lon1=&lat2=&lon2=&resolutionSub=&listLat1=&listLon1=&listLat2=&listLon2=&resolutionList=&endPoint1Lat=&endPoint1Lon=&endPoint2Lat=&endPoint2Lon=&listEndPoint1Lat=&listEndPoint1Lon=&listEndPoint2Lat=&listEndPoint2Lon=&zipCodeList="+zip+"&listZipCodeList=&centerPointLat=&centerPointLon=&distanceLat=&distanceLon=&resolutionSquare=&listCenterPointLat=&listCenterPointLon=&listDistanceLat=&listDistanceLon=&listResolutionSquare=&citiesLevel=&listCitiesLevel=&sector=&gmlListLatLon=&featureType=&requestedTime=&startTime=&endTime=&compType=&propertyName=&product=time-series&begin=2004-01-01T00%3A00%3A00&end=2018-10-13T00%3A00%3A00&Unit=e&temp=temp&pop12=pop12&wspd=wspd&wdir=wdir&sky=sky&wx=wx&rh=rh&wwa=wwa&Submit=Submit";
   String[] lines = loadStrings(url); //removed varialbe url
   String xml = join(lines, "" ); // Turn array into one long String
@@ -96,22 +98,12 @@ void setup() {
   for (int ii = 0; ii < precip.length; ii++) {
     println("Rain"+ precip[ii]);
   }
-
-  //Create icons bases in weather data variable
-
-
-  //println ("# of clouds"+ clouds0.length);
-
-  //PShape clouds1 [] = new PShape [round(cloudCoverage[1]/10)];
-  //PShape clouds2 [] = new PShape [round(cloudCoverage[2]/10)];
-  //PShape clouds3 [] = new PShape [round(cloudCoverage[3]/10)];
 }
-
 
 void draw() {
   smooth();
   background (0);
-  stroke(65);
+  stroke(35);
   strokeWeight(2);
   //Labels
   textFont(coquette, 55);
@@ -124,10 +116,12 @@ void draw() {
   text("Humidity", 45, 550 );
   shape(clock, 75, 608);
   shape(location, 75, 560);
-  fill(175);
+  shape(noaa, 546, -23);
+  fill(196);
   textFont(helvetica, 16);
   text("Date & Time", 25, 680);
   text("Zip Code", 37, 632);
+  text("EXAMPLE", 198, 654);
   int dt_x = 340;
   for (int dt =0; dt<4; dt++) {
     textFont(helvetica, 18);
@@ -146,12 +140,13 @@ void draw() {
 
 
   //Example
-  int temp_example=125;
-  int rain_example = 41;
-  int cloud_example = 76;
-  int wind_example = 20;
-  int humidity_example = 18;
+  int temp_example= 103;
+  int rain_example = 36;
+  int cloud_example = 7;
+  int wind_example = 46;
+  int humidity_example = 33;
   int tempex_x= 170;
+  textFont(helvetica, 15);
   if (temp_example >=120) {
     shape(thermometer, tempex_x, 67);
     fill(255);
@@ -194,64 +189,69 @@ void draw() {
     text("Extremely Cold: "+temp_example+"°", tempex_x+0, 180);
   }
 
+
+  text("Chance of Rain", 187, 265);
+  text(+rain_example+"%", 226, 245);
   PShape water_dropex [] = new PShape [round(rain_example/10)];
   for (int ppx =0; ppx <= water_dropex.length-1; ppx++) {
     water_dropex[ppx] = loadShape("Icons_water_drop.svg");
     shape(water_dropex [ppx], random(111, 217), random(150, 220));
-    text("Chance of Rain", 187, 265);
-    text(+rain_example+"%", 226, 245);
   }
 
+  text("Cloud Coverage", 187, 365);
+  text(+cloud_example+"%", 226, 345);
   PShape cloud_ex [] = new PShape [round(cloud_example/10)];
   for (int clx =0; clx <= cloud_ex.length-1; clx++) {
     cloud_ex[clx] = loadShape("Icons_cloud.svg");
     shape(cloud_ex [clx], random(111, 217), random(246, 316));
-    text("Cloud Coverage", 187, 365);
-    text(+cloud_example+"%", 226, 345);
   }
 
   int windex_x = 169;
   int windex_y = 364;
+  float xr_windex = 0;
+  float yr_windex = 0;
   fill(255);
-  shape(wind, windex_x, windex_y);
+  xr_windex = map(float(wind_example), 0, 100, 0, 20 );
+  yr_windex = map(float(wind_example), 0, 100, 0, 20 );
+  shape(wind, random (windex_x-xr_windex, windex_x+xr_windex), random (windex_y-yr_windex, windex_y+yr_windex));
   textFont(helvetica, 18);
   text(+wind_example+" MPH", windex_x+50, 480);
 
- int humidex_x = 166;
-    if (humidity_example <=40) {
-      shape(turkey, humidex_x, 480);
-      text("Dry", humidex_x+56, 577);
-      text(+humidity_example+"%", humidex_x+54, 559);
-    } else if (humidity_example<=80) {
-      shape(hair, humidex_x, 480);
-      text("Humid", humidex_x+45, 564);
-      text(+humidity_example+"%", humidex_x+60, 540);
-    } else if (humidity_example>= 81) {     
-      shape(duck, humidex_x, 480);
-      text("Muggy", humidex_x+46, 576);
-      text(+humidity_example+"%", humidex_x+61, 557);
-    } 
 
+  int humidex_x = 166;
+  if (humidity_example <=40) {
+    shape(turkey, humidex_x, 480);
+    text("Dry", humidex_x+56, 577);
+    text(+humidity_example+"%", humidex_x+54, 559);
+  } else if (humidity_example<=80) {
+    shape(hair, humidex_x, 480);
+    text("Humid", humidex_x+45, 564);
+    text(+humidity_example+"%", humidex_x+60, 540);
+  } else if (humidity_example>= 81) {     
+    shape(duck, humidex_x, 480);
+    text("Muggy", humidex_x+46, 576);
+    text(+humidity_example+"%", humidex_x+61, 557);
+  } 
 
 
   //Draw Temperature Icons
-  int temp_x = 295;
+  int temp_x = 300;
   for (int j =0; j<4; j++) {
     if (temperatures[j] >=120) {
       shape(thermometer, temp_x, 67);
       fill(255);
       textFont(helvetica, 15);
-      text("Extremely Hot: "+temperatures[j]+"°", temp_x+0, 77);
+      text("Extremely Hot: "+temperatures[j]+"°", temp_x+5, 77);
     } else if (temperatures[j]>=100) {
       shape(flame_full, temp_x, 67);
       fill(255);
       textFont(helvetica, 15);
-      text("Very Hot: "+temperatures[j]+"°", temp_x+0, 77);
+      text("Very Hot: "+temperatures[j]+"°", temp_x+23, 77);
     } else if (temperatures[j]>= 85) {
       shape(flame_small, temp_x, 67);
       fill(255);
       textFont(helvetica, 15);
-      text("Hot: "+temperatures[j]+"°", temp_x+0, 77);
+      text("Hot: "+temperatures[j]+"°", temp_x+40, 77);
     } else if (temperatures[j]>=68) {
       shape(t_shirt, temp_x, 67);
       fill(255);
@@ -261,7 +261,7 @@ void draw() {
       shape(hoodie, temp_x, 67);
       fill(255);
       textFont(helvetica, 15);
-      text("Cool: "+temperatures[j]+"°", temp_x+0, 180);
+      text("Cool: "+temperatures[j]+"°", temp_x+35, 180);
     } else if (temperatures[j]>= 32) {
       shape(scully, temp_x, 67);
       fill(255);
@@ -282,80 +282,84 @@ void draw() {
   }
 
   //Draw Precipitation
-  frameRate(16);
-  fill(#FFFB7E);
-  PShape water_drop0 [] = new PShape [round(precip[0]/10)];
+  fill(255);
+  text("Chance of Rain", 310, 265);
+  text(+precip[0]+"%", 350, 245);
+  text("Chance of Rain", 440, 265);
+  text(+precip[0]+"%", 475, 245);
+  text("Chance of Rain", 565, 265);
+  text(+precip[1]+"%", 600, 245);   
+  text("Chance of Rain", 690, 265);
+  text(+precip[1]+"%", 725, 245);  
+
+  PShape water_drop0 [] = new PShape [round(precip[0]/10)]; 
   for (int pp0 =0; pp0 <= water_drop0.length-1; pp0++) {
-    water_drop0[pp0] = loadShape("Icons_water_drop.svg");
+    water_drop0[pp0] = loadShape("Icons_water_drop.svg");        
     shape(water_drop0 [pp0], random(245, 340), random(150, 220));
-    text("Chance of Rain", 320, 265);
-    text(+precip[0]+"%", 350, 245);
   }
 
   PShape water_drop1 [] = new PShape [round(precip[0]/10)];
-  for (int pp1 =0; pp1 <= water_drop1.length-1; pp1++) {
-    water_drop1[pp1] = loadShape("Icons_water_drop.svg");
+  for (int pp1 =0; pp1 <= water_drop1.length-1; pp1++) {  
+    water_drop1[pp1] = loadShape("Icons_water_drop.svg");   
     shape(water_drop1 [pp1], random(379, 463), random(150, 220));
-    text("Chance of Rain", 450, 265);
-    text(+precip[0]+"%", 475, 245);
   }
   PShape water_drop2 [] = new PShape [round(precip[1]/10)];
-  for (int pp2 =0; pp2 <= water_drop2.length-1; pp2++) {
-    water_drop2[pp2] = loadShape("Icons_water_drop.svg");
+  for (int pp2 =0; pp2 <= water_drop2.length-1; pp2++) {         
+    water_drop2[pp2] = loadShape("Icons_water_drop.svg");      
     shape(water_drop2 [pp2], random(502, 585), random(150, 220));
-    text("Chance of Rain", 575, 265);
-    text(+precip[1]+"%", 600, 245);
   }
   PShape water_drop3 [] = new PShape [round(precip[1]/10)];
-  for (int pp3 =0; pp3 <= water_drop3.length-1; pp3++) {
-    water_drop3[pp3] = loadShape("Icons_water_drop.svg");
+  for (int pp3 =0; pp3 <= water_drop3.length-1; pp3++) { 
+    water_drop3[pp3] = loadShape("Icons_water_drop.svg");      
     shape(water_drop3 [pp3], random(630, 745), random(150, 220));
-    text("Chance of Rain", 700, 265);
-    text(+precip[1]+"%", 725, 245);
-  }
-
+  }  
 
   //Draw Clouds
   frameRate(3);
-  fill(#3fb2fe);
+  fill(255);
+  text("Coverage", 335, 365);
+  text(+cloudCoverage[0]+"%", 348, 345);
+  text("Coverage", 460, 365);
+  text(+cloudCoverage[1]+"%", 475, 345);
+  text("Coverage", 585, 365);
+  text(+cloudCoverage[2]+"%", 600, 345);
+  text("Coverage", 715, 365);
+  text(+cloudCoverage[3]+"%", 730, 345);
+
   PShape clouds0 [] = new PShape [round(cloudCoverage[0]/10)];
   for (int c0 =0; c0 <= clouds0.length-1; c0++) {
-    clouds0[c0] = loadShape("Icons_cloud.svg");
+    clouds0[c0] = loadShape("Icons_cloud.svg");       
     shape(clouds0 [c0], random(250, 340), random(246, 318));
-    text("Coverage", 335, 365);
-    text(+cloudCoverage[0]+"%", 348, 345);
   }
 
   PShape clouds1 [] = new PShape [round(cloudCoverage[1]/10)];
   for (int c1 =0; c1 <= clouds1.length-1; c1++) {
-    clouds1[c1] = loadShape("Icons_cloud.svg");
+    clouds1[c1] = loadShape("Icons_cloud.svg");        
     shape(clouds1 [c1], random(379, 463), random(246, 318));
-    text("Coverage", 460, 365);
-    text(+cloudCoverage[1]+"%", 475, 345);
   }
 
   PShape clouds2 [] = new PShape [round(cloudCoverage[2]/10)];
   for (int c2 =0; c2 <= clouds2.length-1; c2++) {
-    clouds2[c2] = loadShape("Icons_cloud.svg");
+    clouds2[c2] = loadShape("Icons_cloud.svg");        
     shape(clouds2 [c2], random(502, 585), random(250, 320));
-    text("Coverage", 585, 365);
-    text(+cloudCoverage[2]+"%", 600, 345);
   }
 
   PShape clouds3 [] = new PShape [round(cloudCoverage[3]/10)];
   for (int c3 =0; c3 <= clouds3.length-1; c3++) {
-    clouds3[c3] = loadShape("Icons_cloud.svg");
+    clouds3[c3] = loadShape("Icons_cloud.svg"); 
     shape(clouds3 [c3], random(630, 745), random(246, 318));
-    text("Coverage", 715, 365);
-    text(+cloudCoverage[3]+"%", 730, 345);
   }
 
   //Draw Wind
   int wind_x = 292;
   int wind_y = 364;
+  float x_rand = 0;
+  float y_rand = 0;
   for (int wnds =0; wnds<4; wnds++) {
+    x_rand = map(float(windSpeeds[wnds]), 0, 100, 0, 20 );
+    y_rand = map(float(windSpeeds[wnds]), 0, 100, 0, 20 );
     fill(255);
-    shape(wind, wind_x, wind_y);
+    shape(wind, random(wind_x-x_rand, wind_x+x_rand), random(wind_y-y_rand, wind_y+y_rand));
     textFont(helvetica, 18);
     text(+windSpeeds[wnds]+" MPH", wind_x+50, 482);
     wind_x+=125;
@@ -365,8 +369,8 @@ void draw() {
   for (int h =0; h<4; h++) {
     if (humidity[h] <=40) {
       shape(turkey, humid_x, 480);
-      text("Dry", humid_x+67, 556);
-      text(+humidity[h]+"%", humid_x+57, 566);
+      text("Dry", humid_x+56, 577);
+      text(+humidity[h]+"%", humid_x+54, 559);
     } else if (humidity[h]<=80) {
       shape(hair, humid_x, 480);
       text("Humid", humid_x+45, 564);
