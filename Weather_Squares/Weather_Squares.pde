@@ -3,6 +3,7 @@ int[] windSpeeds;
 int[] windDirections;
 int[] cloudCoverage;
 int[] times;
+int[] times_precip;
 int[] humidity;
 String[] dates;
 PShape clock;
@@ -60,12 +61,14 @@ void setup() {
   String cc = "";
   String hd = "";
   String timestring = "";
+  String timestring_precip = "";
   t = giveMeTextBetween(xml, "<temperature", "</temperature>");
   ws = giveMeTextBetween(xml, "<wind-speed", "</wind-speed>");
   wd = giveMeTextBetween(xml, "<direction", "</direction>");
   cc = giveMeTextBetween(xml, "<cloud-amount", "</cloud-amount>");
   hd = giveMeTextBetween(xml, "<humidity", "</humidity>");
   timestring = giveMeTextBetween(xml, "<layout-key>k-p3h", "</time-layout>");
+  timestring_precip = giveMeTextBetween(xml, "<layout-key>k-p12h", "</time-layout>");
   temperatures = matchingValues(t);
   windSpeeds = matchingValues(ws);
   windDirections = matchingValues(wd);
@@ -73,6 +76,7 @@ void setup() {
   humidity = matchingValues(hd);
   times = matchingTime(timestring);
   dates = matchingDate(timestring);
+  times_precip = matchingTime(timestring_precip);
   //Data Test
   for (int i = 0; i < temperatures.length; i++) {
     println("Time ="+ times[i]);
@@ -203,7 +207,7 @@ void draw() {
 }
 
 
-//Regex from: 
+//Regex credit Daniel Shiffman <http://shiffman.net/2011/12/22/night-3-regular-expressions-in-processing/> 
 int[] matchingValues(String s) {
   String[][] m = matchAll(s, "<value>(.*?)</value>");
   int[] ints;
@@ -215,21 +219,18 @@ int[] matchingValues(String s) {
   return ints;
 }
 
-//Regex from: 
+//Regex credit Daniel Shiffman <http://shiffman.net/2011/12/22/night-3-regular-expressions-in-processing/> 
 int[] matchingTime(String s) {
   String[][] y = matchAll(s, "<start-valid-time>(.*?)</start-valid-time>");
   int[] ints;
   ints = new int[y.length];
   for (int i = 0; i < y.length; i++) {
     ints[i] = int(giveMeTextBetween(y[i][1], "T", ":"));
-    if (ints [i] >12) {
-      ints [i]-= 12;
-    }
   }
   return ints;
 }
 
-//Regex from: 
+//Regex credit Daniel Shiffman <http://shiffman.net/2011/12/22/night-3-regular-expressions-in-processing/> 
 String[] matchingDate(String s) {
   String[][] x = matchAll(s, "<start-valid-time>(.*?)</start-valid-time>");
   String[] dates;
@@ -240,7 +241,7 @@ String[] matchingDate(String s) {
   return dates;
 }
 
-//Function to search for text from the XML file. Derived from: 
+//Function to search for text from the XML file. Credit Daniel Shiffman <http://www.learningprocessing.com/examples/chapter-18/example-18-5/> 
 String giveMeTextBetween(String xmlFile, String before, String after) {
   String found = "";
   int start = xmlFile.indexOf(before);    // Find the index of the beginning tag
